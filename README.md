@@ -16,3 +16,7 @@ sudo gem install instabug-xcode-upload
 
 ## Using ##
 
+Add an After Integration Trigger run script with the command:
+```
+instabug-xcodebot-upload -k <INSTABUG API KEY>
+```
