@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Jason Gabriele"]
   s.email       = 'jason.gabriele@gmail.com'
   s.executables = ['instabug-xcodebot-upload']
-  s.homepage    = 'http://rubygems.org/gems/hola'
+  s.homepage    = 'https://github.com/niveus/instabug-xcodebot-upload'
   s.license     = 'MIT'
   s.required_ruby_version = '>= 2.0'
 end
