@@ -7,7 +7,7 @@ INSTABUG_ENDPOINT = "https://api.instabug.com/api/ios/v1/dsym"
 
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: instabug-upload [options]"
+  opts.banner = "Usage: instabug-xcodebot-upload [options]"
 
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
     options[:verbose] = v
@@ -44,61 +44,61 @@ end
 # Get a list of the dSYMs
 dsym_list = Dir.glob(File.join(dsym_path, "*.dSYM"))
 
-  # Change to dsym dir
-  Dir.chdir dsym_path do
+# Change to dsym dir
+Dir.chdir dsym_path do
     
-    # Read project version
-    version = IO.popen(["/usr/libexec/PlistBuddy",
-                        "-c",
-                        "Print :ApplicationProperties:CFBundleShortVersionString",
-                        File.join(archive_path, "Info.plist")]).read.strip
+  # Read project version
+  version = IO.popen(["/usr/libexec/PlistBuddy",
+                      "-c",
+                      "Print :ApplicationProperties:CFBundleShortVersionString",
+                      File.join(archive_path, "Info.plist")]).read.strip
     
-    # Loop through dSYMs, zip and upload each
-    dsym_list.each do |dsym|
-      dsym_base_name = File.basename(dsym)
+  # Loop through dSYMs, zip and upload each
+  dsym_list.each do |dsym|
+    dsym_base_name = File.basename(dsym)
       
-      # Zip it
-      dsym_zip_name = "#{dsym_base_name}-#{version}.zip"
+    # Zip it
+    dsym_zip_name = "#{dsym_base_name}-#{version}.zip"
     
-      puts "Zipping #{dsym_zip_name}..." if options[:verbose]
+    puts "Zipping #{dsym_zip_name}..." if options[:verbose]
       
-      success = system("/usr/bin/zip", "-rq9", dsym_zip_name, dsym_base_name)
+    success = system("/usr/bin/zip", "-rq9", dsym_zip_name, dsym_base_name)
       
-      # If it failed, make sure to delete it
-      unless success
-        File.unlink(dsym_zip_name) if File.exists?(dsym_zip_name)
-        puts "Failed to create zip file: #{dsym_zip_name}. Aborting"
-        exit 1
-      end
-      
-      # Upload the zip
-      output = IO.popen(["curl",
-                         INSTABUG_ENDPOINT,
-                         "-w %{http_code}",
-                         "--silent",
-                         "-o /dev/null",
-                         "-F",
-                         "dsym=@\"#{dsym_zip_name}\"",
-                         "-F",
-                         "token=#{options[:api_key]}"]).read.strip
-                        
-      # Remove zip file
-      File.unlink(dsym_zip_name)
-                        
-      if output == "000"
-        puts "Failed to upload zip file. No internet connection. Aborting"
-        exit 1
-      elsif output == "422"
-        puts "Failed to upload zip file: #{dsym_zip_name}. Make sure you are using the correct token. Aborting"
-        exit 1
-      elsif output != "200"
-        puts "Failed to upload zip file: #{dsym_zip_name}. #{output}. Aborting"
-        exit 1
-      end
-      
-      puts "Completed uploading #{dsym_zip_name}" if options[:verbose]
+    # If it failed, make sure to delete it
+    unless success
+      File.unlink(dsym_zip_name) if File.exists?(dsym_zip_name)
+      puts "Failed to create zip file: #{dsym_zip_name}. Aborting"
+      exit 1
     end
+      
+    # Upload the zip
+    output = IO.popen(["curl",
+                       INSTABUG_ENDPOINT,
+                       "-w %{http_code}",
+                       "--silent",
+                       "-o /dev/null",
+                       "-F",
+                       "dsym=@\"#{dsym_zip_name}\"",
+                       "-F",
+                       "token=#{options[:api_key]}"]).read.strip
+    
+    # Remove zip file
+    File.unlink(dsym_zip_name)
+                        
+    if output == "000"
+      puts "Failed to upload zip file. No internet connection. Aborting"
+      exit 1
+    elsif output == "422"
+      puts "Failed to upload zip file: #{dsym_zip_name}. Make sure you are using the correct token. Aborting"
+      exit 1
+    elsif output != "200"
+      puts "Failed to upload zip file: #{dsym_zip_name}. #{output}. Aborting"
+      exit 1
+    end
+      
+    puts "Completed uploading #{dsym_zip_name}" if options[:verbose]
   end
+end
 
 if options[:verbose]
   puts "Uploaded the following dSYMs: #{dsym_list.join(', ')}"

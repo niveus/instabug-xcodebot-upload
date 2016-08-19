@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'instabug-xcodebot-upload'
-  s.version     = '1.0.0'
-  s.date        = '2016-08-16'
+  s.version     = '1.0.1'
+  s.date        = '2016-08-18'
   s.summary     = "Upload dSYMs to Instabug via Xcode bots"
   s.description = "Uploads dSYMs from the xcarchive to Instabug via an After-Integration Trigger"
   s.authors     = ["Jason Gabriele"]

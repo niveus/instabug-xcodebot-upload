@@ -1,8 +1,7 @@
 Instabug Xcode Bot Uploader
 ===========================
 
-This script will upload files from an xcarchive to Instabug. It's designed
-to be run as an After Integration Trigger script.
+This script will upload files from a xcarchive to Instabug. It's designed to be run as an After Integration Trigger Run Script.
 
 ## Installation ##
 If you are using Homebrew:
@@ -15,10 +14,13 @@ sudo gem install instabug-xcodebot-upload
 ```
 
 ## Using ##
+First, locate where the executable was placed. This is probably `/usr/local/bin/instabug-xcodebot-upload`.
+
+```
+which instabug-xcodebot-upload
+```
 
 Add an After Integration Trigger run script with the command:
 ```
-instabug-xcodebot-upload -k <INSTABUG API KEY>
+/usr/local/bin/instabug-xcodebot-upload -k <INSTABUG API KEY>
 ```
-
-If you are using Homebrew, make sure /usr/local/bin is in your bot's $PATH.
